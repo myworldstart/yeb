@@ -1,6 +1,13 @@
 <template>
     <div>
-    <el-form :rules="rules" ref="loginForm" :model="loginForm" class = 'loginContainer'>
+    <el-form :rules="rules"
+             v-loading="loading"
+             element-loading-text="正在登陆...."
+             element-loading-spinner="el-icon-loading"
+             element-loading-background="rgba(0, 0, 0, 0.8)"
+             ref="loginForm"
+             :model="loginForm"
+             class = 'loginContainer'>
         <h3 class="loginTitle">系统登录</h3>
         <el-form-item prop="username">
             <el-input type="text" auto-complete="false" v-model="loginForm.username" placeholder="请输入用户名"></el-input>
@@ -10,7 +17,7 @@
         </el-form-item>
         <el-form-item prop="code">
             <el-input type="text" auto-complete="false" v-model="loginForm.code" placeholder="请点击图片更换验证码" style="width: 250px;margin-right: 5px"></el-input>
-            <img :src="captchaurl">
+            <img :src="captchaurl" @click="captchaurl">
         </el-form-item>
         <el-checkbox v-model="checked" class = "loginRemember">记住我</el-checkbox>
         <el-button type="primary" style="width: 100%" @click="submitLogin">登录</el-button>
@@ -19,17 +26,21 @@
 </template>
 
 <script>
+
+import {postRequest} from "@/utils/api";
+
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
     name: "Login",
     data(){
         return{
-            captchaurl:'',
+            captchaurl:'/captcha?time='+new Date(),
             loginForm:{
                 username:'admin',
                 password:'123',
                 code:''
             },
+            loading:false,
             checked:true,
             rules:{
                 username: [{required:true, message:'请输入用户名', trigger:'blur'}],
@@ -39,13 +50,25 @@ export default {
         }
     },
     methods:{
+        updateCaptcha(){
+          this.captchaurl = '/captcha?time=' + new Date();
+        },
         submitLogin(){
             this.$refs.loginForm.validate((valid) => {
                 if(valid){
-                    alert('submit');
+                    this.loading = true;
+                    postRequest('/login', this.loginForm).then(resp=>{
+                        if(resp){
+                            this.loading = false;
+                            const tokenStr = resp.obj.tokenHead + resp.obj.token;
+                            window.sessionStorage.setItem('tokenStr', tokenStr);
+                            let path = this.$router.query.redirect;
+                            this.$router.replace((path=='/' || path==undefined)?'/home':path);
+                        }
+                    })
                 }else{
-                     this.$message.error('请输入所有字段');
-                    return false
+                    this.$message.error('请输入所有字段');
+                    return false;
                 }
             })
         }
@@ -71,5 +94,10 @@ export default {
     .loginRemember{
         text-align: left;
         margin:0px 0px 15px 0px;
+    }
+
+    .el-form-item__content{
+        display: flex;
+        align-items: center;
     }
 </style>

@@ -1,35 +1,37 @@
 <template>
     <div>
         <el-tabs v-model="activeName" type="card">
-        <el-tab-pane label="部门管理" name="first">部门管理</el-tab-pane>
-            <h1>部门管理</h1>
-            <table border="1">
-                <tr>
-                    <td>姓名</td>
-                    <td>地址</td>
-                </tr>
-                <tr>
-                    <td>张三</td>
-                    <td>上海</td>
-                </tr>
-            </table>
-        <el-tab-pane label="职位管理" name="second">职位管理</el-tab-pane>
-        <el-tab-pane label="职称管理" name="third">职称管理</el-tab-pane>
-        <el-tab-pane label="奖惩规则" name="fourth">奖惩规则</el-tab-pane>
-        <el-tab-pane label="权限组" name="five">权限组</el-tab-pane>
+        <el-tab-pane label="部门管理" name="DepMana"><PosMana></PosMana></el-tab-pane>
+        <el-tab-pane label="职位管理" name="EcMana"><EcMana></EcMana></el-tab-pane>
+        <el-tab-pane label="职称管理" name="JoblevelMana"><JoblevelMana></JoblevelMana></el-tab-pane>
+        <el-tab-pane label="奖惩规则" name="PermissMana"><PermissMana></PermissMana></el-tab-pane>
+        <el-tab-pane label="权限组" name="PosMana"><PosMana></PosMana></el-tab-pane>
   </el-tabs>
     </div>
 </template>
 
 <script>
-export default {
-    name: "SysBasic",
-    data(){
-        return{
-            activateName: 'first'
+    import DepMana from "@/components/sys/basic/DepMana";
+    import EcMana from "@/components/sys/basic/EcMana";
+    import JoblevelMana from "@/components/sys/basic/JoblevelMana";
+    import PermissMana from "@/components/sys/basic/PermissMana";
+    import PosMana from "@/components/sys/basic/PosMana";
+
+    export default {
+        name: "SysBasic",
+        data(){
+            return{
+                activateName: 'first'
+            }
+        },
+        components:{
+            DepMana,
+            EcMana,
+            JoblevelMana,
+            PermissMana,
+            PosMana
         }
     }
-}
 </script>
 
 <style scoped>

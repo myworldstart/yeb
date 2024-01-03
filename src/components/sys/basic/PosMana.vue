@@ -17,6 +17,7 @@
                 size="small"
                 stripe
                 border
+                @selection-change="handleSelectionChange"
                 style="width: 70%">
                  <el-table-column
                     type="selection"
@@ -51,6 +52,7 @@
                 </el-table-column>
              </el-table>
         </div>
+        <el-button size="small" style="margin-top: 8px" type = 'danger' :disabled="this.multipleSelection.length == 0" @click="deleteMany">批量删除</el-button>
         <el-dialog
             title="编辑职位"
             :visible.sync="dialogVisible"
@@ -80,13 +82,39 @@ export default {
             dialogVisible:false,
             updatePos:{
                 name:''
-            }
+            },
+            multipleSelections:[]
         }
     },
     mounted() {
         this.initPositions();
     },
     methods:{
+        deleteMany(){
+            this.$confirm('此操作将永久删除['+this.multipleSelections.length+']条职位,是否继续?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+                let ids = '?'
+                this.multipleSelections.forEach(item=>{
+                    ids += 'ids='+item.id+'&';
+                })
+                this.deleteRequset('/system/basic/pos/' + ids).then(resp=>{
+                    if(resp){
+                        this.initPositions();
+                    }
+                })
+            }).catch(() => {
+              this.$message({
+                type: 'info',
+                message: '已取消删除'
+              });
+            });
+        },
+        handleSelectionChange(val){
+            this.multipleSelections = val;
+        },
         doUpdate(){
             this.putRequest('/system/basic/pos', this.updatePos).then(resp=>{
                 if(resp){
